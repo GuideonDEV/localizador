@@ -1,1 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Verificación de ubicación</title>
+</head>
+<body>
+  <h2>Verificando ubicación...</h2>
+  <p id="status">Solicitando permiso de ubicación...</p>
 
+  <script>
+    function enviarUbicacion(lat, lon) {
+      fetch('/api/guardar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ latitud: lat, longitud: lon, timestamp: new Date().toISOString() })
+      })
+      .then(() => {
+        document.getElementById('status').textContent = "Ubicación enviada correctamente.";
+      })
+      .catch(() => {
+        document.getElementById('status').textContent = "Error al enviar la ubicación.";
+      });
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => enviarUbicacion(pos.coords.latitude, pos.coords.longitude),
+        err => {
+          document.getElementById('status').textContent = "Permiso denegado o error de ubicación.";
+        }
+      );
+    } else {
+      document.getElementById('status').textContent = "Tu navegador no soporta geolocalización.";
+    }
+  </script>
+</body>
+</html>
